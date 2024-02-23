@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=60", "setuptools-scm>=8.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sentinel2_tests_irr"
+version = "0.0.0"
+description = "backend tests for s2 data (l2) downloads"
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+authors = [{name = 'iram'}]
+
+dynamic = ["dependencies"]
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[project.urls]
+Homepage = "https://github.com/irr-github/sat-data"
+Issues = "https://github.com/irr-github/sat-data/issues"
+
+[tool.pytest.ini_options]
+testpaths = ["tests",]
+log_cli = true
+log_level = "DEBUG"
+
+[tool.black]
+skip-string-normalization = false
