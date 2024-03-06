@@ -14,9 +14,7 @@ classifiers = [
 ]
 authors = [{name = 'iram'}]
 
-dynamic = ["dependencies"]
-[tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
+dependencies = ['sentinelhub==3.10.1','matplotlib']
 
 [project.urls]
 Homepage = "https://github.com/irr-github/sat-data"
