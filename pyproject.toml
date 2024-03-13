@@ -14,7 +14,7 @@ classifiers = [
 ]
 authors = [{name = 'iram'}]
 
-dependencies = ['sentinelhub==3.10.1','matplotlib']
+dependencies = ['sentinelhub==3.10.1','matplotlib', 'geopandas', 'pystac_client]
 
 [project.urls]
 Homepage = "https://github.com/irr-github/sat-data"
