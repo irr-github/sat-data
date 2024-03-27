@@ -18,7 +18,8 @@ def make_box_request(
     script: str,
     area_coordinates: Tuple[float],
     time_interval: Tuple[str],
-    resolution_m: 60,
+    resolution_m = 60,
+    max_could_frac = None,
     config=SHConfig(),
     data_collection=DataCollection.SENTINEL2_L1C,
     crs=CRS.WGS84,
@@ -29,6 +30,8 @@ def make_box_request(
         script (str): the scripts that sentinelhub will use to search for data
         data_collection (DataCollection): the sentinel data collection. Defaults to SENTINEL2_L1C
         time_interval (Tuple[str]): the time_interval in which the data should be searched for (yyyy-mm-dd,)
+        resolution_m (int): the resolution in m. Defaults to 60 (lowest - swir16)
+        max_could_frac (float): the max cloud fraction. default =0.2
         config (object): the SHConfig. Defaults to the default config.
                         This can be set with utils.sentinelhub_access.set_default_sentinelhub_credentials
         area_coordinates (Tuple[float]): A tuple of Lon,lat,lon,lat coords defining a box
@@ -61,6 +64,7 @@ def make_box_request(
             SentinelHubRequest.input_data(
                 data_collection=data_collection,
                 time_interval=time_interval,
+                maxcc=max_could_frac,
             )
         ],
         responses=[SentinelHubRequest.output_response("default", MimeType.PNG)],

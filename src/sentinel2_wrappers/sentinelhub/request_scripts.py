@@ -34,13 +34,29 @@ TRUECOLOR_CLM = """
     } 
 """
 
+SWIR16 = """
+    //VERSION=3
 
-def gen_L1c_eval_script(bands_list=["B02"], CLM=False):
+    function setup() {
+        return {
+            input: [{
+                bands: ["B11"]
+            }],
+            output: {
+                bands: 3
+            }
+        };
+    }
+
+    function evaluatePixel(sample) {
+        return [sample.B11];
+    }
+"""
+
+def gen_L1c_eval_script(bands_list=["B02"]):
     """experimental script generator untested"""
 
     n_bands = len(bands_list)
-    if CLM:
-        bands_list += [CLM]
 
     script = """
     //VERSION=3
@@ -54,11 +70,7 @@ def gen_L1c_eval_script(bands_list=["B02"], CLM=False):
         }
 
         function evaluatePixel(sample) {
-        if (sample.CLM == 1) {
-            return [4* + sample.B04, sample.B03, sample.B02]
-        }
-        return [sample.B04, sample.B03, sample.B02];
-        } 
     """
+    script+=f"    return {['sample.'+band for band in bands_list]};}}"
 
     return script
