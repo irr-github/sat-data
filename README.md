@@ -37,5 +37,6 @@ Here are some important required packages
 the dynamic link between requirements.txt and pyproject.toml does not work
 
 ## TODOS
+- fix projections and lat/lon plotting
 - try odc.stac stac_load backend
 - try odc.alog to_rgba
