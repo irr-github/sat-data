@@ -1,5 +1,4 @@
-from lib2to3.pytree import _Results
-import geopandas as gpd
+from geopandas import GeoDataFrame
 from pystac_client import Client, ItemSearch
 import shapely
 from sentinel2_tests.utils.constants import CATALOGUES, AWS_EARTH_SEARCH_v0, AWS_EARTH_SEARCH_v1, PLANETARY_COMPUTER
@@ -22,7 +21,8 @@ def search_catalogue(aoi_bbox:tuple, catalogue = CATALOGUES[PLANETARY_COMPUTER],
     Returns:
         pystac_client.ItemSearch: the pystac query result
     """    
-    if catalogue not in CATALOGUES.values():
+    
+    if not catalogue in CATALOGUES.values():
         raise ValueError(f'Unsupported Catalogue {catalogue} not in {list(CATALOGUES.values())}')
     
     catalog = Client.open(catalogue)
@@ -65,7 +65,7 @@ def check_collection_in_catalogue(catalog:str, collection:str):
 
     return True
     
-def parse_results(query: ItemSearch)->gpd.GeoDataFrame:
+def parse_results(query: ItemSearch)->GeoDataFrame:
     """parse results into a geopandas DataFrame
 
     Args:
@@ -74,7 +74,7 @@ def parse_results(query: ItemSearch)->gpd.GeoDataFrame:
         ValueError: if no results were found
 
     Returns:
-        gpd.GeoDataFrame: the results ranked by aoi coverage
+        GeoDataFrame: the results ranked by aoi coverage
     """    
     
     collection = query.item_collection()
@@ -86,18 +86,32 @@ def parse_results(query: ItemSearch)->gpd.GeoDataFrame:
         c.properties['id']=c.id
         c.properties['assets'] = c.assets
         
-    results_gdf = gpd.GeoDataFrame.from_features(collection)
+    results_gdf = GeoDataFrame.from_features(collection)
     aoi = shapely.geometry.box(*query.get_parameters()['bbox'])
     aoi_frac = lambda geo: shapely.intersection(geo, aoi).area/aoi.area
     results_gdf['aoi_fraction'] = results_gdf['geometry'].apply(aoi_frac)
     
     return results_gdf.sort_values('aoi_fraction', ascending=False)
 
-def find_all_granules_for_aoi_coverage(gdf_results:gpd.GeoDataFrame, query:ItemSearch):
+def get_granule_list(gdf_results:GeoDataFrame, query:ItemSearch, min_aoi_fraction = 0.999):
+    """ find the granule list that will fully cover the aoi
+
+    Args:
+        gdf_results (GeoDataFrame): the search results parsed into a gdf
+        query (ItemSearch): the ItemSearch results from the pystac queyr
+        min_aoi_fraction (float, optional): min fraction covered. Defaults to 0.999.
+
+    Raises:
+        ValueError: _description_
+
+    Returns:
+        list: list of graules
+    """
     
     granules_to_fetch = []
     
     gdf = gdf_results.copy()
+    gdf['query_index'] = gdf.index.values
     
     # the original aoi
     current_bbox = shapely.geometry.box(*query.get_parameters()['bbox'])
@@ -112,7 +126,7 @@ def find_all_granules_for_aoi_coverage(gdf_results:gpd.GeoDataFrame, query:ItemS
         else:
             granules_to_fetch.append(result)
             
-        if result.aoi_fraction == 1:
+        if result.aoi_fraction >= min_aoi_fraction:
             break
         else:
             # the remaining area
@@ -120,30 +134,6 @@ def find_all_granules_for_aoi_coverage(gdf_results:gpd.GeoDataFrame, query:ItemS
         
     return granules_to_fetch
         
-    
-        
-    
 
-def download_top_result(gdf_results:gpd.GeoDataFrame, query:ItemSearch, band:str, rank_by = ['aoi_fraction']):
-    """get the top result from the query search results
 
-    Args:
-        gdf_results (gpd.GeoDataFrame): the geodataframe containing the features
-        query (ItemSearch): the pystack query result
-        band (str): the asset to be fetched
-        rank_by (list, optional): the colum(s) to use for ranking results. Defaults to ['aoi_fraction'].
-
-    Returns:
-        rioxarray: the band
-    """    
-    
-    # sort the data
-    gdf = gdf_results.copy()
-    gdf.sort_values(by = rank_by, ascending=False, inplace=True)
-    # get the best result's index in the collection
-    item_idx = gdf.reset_index().loc[0]['index']
-    itm = [itm for itm in query.items()][item_idx]
-
-    # download the data
-    return rx.open_rasterio(itm.assets[band].get_absolute_href())
 
