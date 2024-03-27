@@ -49,4 +49,5 @@ def visualise_granules_pystac(parsed_results : GeoDataFrame, query_res: ItemSear
     return fig, ax
 
 def plot_latlon(raster_data:DataArray):
+    pass
     
