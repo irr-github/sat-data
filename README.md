@@ -9,7 +9,7 @@ This is not intended as a fully fledged project with tests but could be adapted 
 
 The sentinelhub wrapper comes with functions to set your credentials and to request scripts.
 
->[!NOTE] The sentinelhub_wrapper uses the copernicus dataspace, which does not include all features (e.g. no cloud mask). The paid version includes more data flags and masks.
+>**NOTE**: The sentinelhub_wrapper uses the copernicus dataspace, which does not include all features (e.g. no cloud mask). The paid version includes more data flags and masks.
 
 
 ## setup
