@@ -37,7 +37,3 @@ def reproject_data(sentinel_data):
     
     pass
     
-
-def regrid_s2():
-    
-    pass

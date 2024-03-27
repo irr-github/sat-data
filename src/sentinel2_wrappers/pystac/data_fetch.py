@@ -6,7 +6,8 @@ from geopandas import GeoDataFrame
 from typing import List
 from pystac_client import Client, ItemSearch
 
-from sentinel2_tests.utils.constants import CATALOGUES, AWS_EARTH_SEARCH_v0, AWS_EARTH_SEARCH_v1, PLANETARY_COMPUTER
+from sentinel2_wrappers.utils.constants import CATALOGUES, AWS_EARTH_SEARCH_v0, AWS_EARTH_SEARCH_v1, PLANETARY_COMPUTER
+from xarray import DataArray
 
 def download_top_result(gdf_results:GeoDataFrame, query:ItemSearch, band:str, rank_by = ['aoi_fraction']):
     """get the top result from the query search results
@@ -31,7 +32,7 @@ def download_top_result(gdf_results:GeoDataFrame, query:ItemSearch, band:str, ra
     # download the data
     return open_rasterio(itm.assets[band].get_absolute_href())
 
-def fetch_aoi_data(granule_list:List[GeoDataFrame], query_results:ItemSearch,asset_names: List[str], resolution = None ,  limit_to_bbox = True ):
+def fetch_aoi_data(granule_list:List[GeoDataFrame], query_results:ItemSearch,asset_names: List[str], resolution = None ,  limit_to_bbox = True )->DataArray:
     """download and combine the data.
        To get vis data, download the RGB bands and combine them with the process_data tools
 
@@ -73,3 +74,29 @@ def fetch_aoi_data(granule_list:List[GeoDataFrame], query_results:ItemSearch,ass
     )
     
     return data
+
+
+def make_mosaic(collated_data:DataArray, dim = 'time')->DataArray:
+    """make a mosaic from the 'fetch_aoi' data
+
+    Args:
+        dim (str, optional): the dimension on which to mosaic. Defaults to 'time'.
+
+    Returns:
+        DataArray: the mosaiced array, ready for plotting
+    """    
+    
+    return stackstac.mosaic(collated_data, dim = dim)
+
+
+def compute_median_image(collated_data:DataArray, dim = 'time')->DataArray:
+    """merge arrays from the 'fetch_aoi' data using the median value. 
+       For more timesnaps and overlap, median is good to remove clouds
+
+    Args:
+        dim (str, optional): the dimension on which to mosaic. Defaults to 'time'.
+
+    Returns:
+        DataArray: the mosaiced array, ready for plotting
+    """    
+    return collated_data.median(dim="time").compute()

@@ -1,7 +1,7 @@
 from geopandas import GeoDataFrame
 from pystac_client import Client, ItemSearch
 import shapely
-from sentinel2_tests.utils.constants import CATALOGUES, AWS_EARTH_SEARCH_v0, AWS_EARTH_SEARCH_v1, PLANETARY_COMPUTER
+from sentinel2_wrappers.utils.constants import CATALOGUES, AWS_EARTH_SEARCH_v0, AWS_EARTH_SEARCH_v1, PLANETARY_COMPUTER
 import rioxarray as rx
 
 def search_catalogue(aoi_bbox:tuple, catalogue = CATALOGUES[PLANETARY_COMPUTER], cloud_cover_limit = None, collections = ["sentinel-2-l2a"], date_range = ("2021-09-16","2021-10-16"), max_results = None)-> ItemSearch:

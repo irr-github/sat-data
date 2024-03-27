@@ -1,7 +1,7 @@
 import logging
 from sentinelhub import SHConfig
 
-from sentinel2_tests.utils.constants import SH_BASE_URL, SH_TOKEN_URL
+from sentinel2_wrappers.utils.constants import SH_BASE_URL, SH_TOKEN_URL
 
 logging.getLogger(__name__)
 
