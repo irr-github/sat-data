@@ -18,13 +18,14 @@ def make_box_request(
     script: str,
     area_coordinates: Tuple[float],
     time_interval: Tuple[str],
-    resolution_m = 60,
-    max_could_frac = None,
+    resolution_m=60,
+    max_could_frac=None,
     config=SHConfig(),
     data_collection=DataCollection.SENTINEL2_L1C,
     crs=CRS.WGS84,
 ):
-    """Make a request from a collection in thesentinel data catalogue based on a script
+    """Make a request from a collection in thesentinel data catalogue based on a script.
+    This automatically mosaics the data.
 
     Args:
         script (str): the scripts that sentinelhub will use to search for data
@@ -41,7 +42,7 @@ def make_box_request(
         ValueError: if data_collection is invalid
 
     Returns:
-        _type_: _description_
+        SentinelHubRequest: the request result
     """
 
     # check data collection exists

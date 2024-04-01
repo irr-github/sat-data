@@ -53,24 +53,31 @@ SWIR16 = """
     }
 """
 
-def gen_L1c_eval_script(bands_list=["B02"]):
-    """experimental script generator untested"""
 
+def gen_eval_script(bands_list=["B02"]):
+    """experimental script maker"""
+
+    bands_list = ["B02", "B03", "B04"]
+    bands_list_str = str(bands_list)
     n_bands = len(bands_list)
+    eval_ = str(["sample." + band for band in bands_list])
+    eval_ = eval_.replace("'", "")  # remove the quote marks
+    script = f"""
+        //VERSION=3
+    
+        function setup() {{
+            return {{
+                input: [{{
+                    bands: {bands_list_str}
+                }}],
+                output: {{
+                    bands: {n_bands}
+                }}
+            }};
+        }}
 
-    script = """
-    //VERSION=3
-    function setup() {
-    return {
+        function evaluatePixel(sample) {{
+            return {eval_};
+        }}
     """
-    script += f"    input: {bands_list}"
-    script += f"    output: {{bands: {n_bands} }}"
-    script += """
-        }
-        }
-
-        function evaluatePixel(sample) {
-    """
-    script+=f"    return {['sample.'+band for band in bands_list]};}}"
-
     return script
