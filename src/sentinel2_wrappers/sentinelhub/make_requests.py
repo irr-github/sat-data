@@ -1,3 +1,4 @@
+from aenum import constant
 from sentinelhub import (
     CRS,
     BBox,
@@ -11,7 +12,7 @@ from sentinelhub import (
     bbox_to_dimensions,
 )
 from typing import List, Tuple
-from ..utils.constants import SH_BASE_URL
+from ..utils.constants import SH_BASE_URL, MOSAICS
 
 
 def make_box_request(
@@ -22,6 +23,7 @@ def make_box_request(
     max_could_frac=None,
     config=SHConfig(),
     data_collection=DataCollection.SENTINEL2_L1C,
+    mosaic_order: constant = MOSAICS["least_cloudy"],
     crs=CRS.WGS84,
 ):
     """Make a request from a collection in thesentinel data catalogue based on a script.
@@ -36,11 +38,12 @@ def make_box_request(
         config (object): the SHConfig. Defaults to the default config.
                         This can be set with utils.sentinelhub_access.set_default_sentinelhub_credentials
         area_coordinates (Tuple[float]): A tuple of Lon,lat,lon,lat coords defining a box
-        crs (_type_, optional): _description_. Defaults to CRS.WGS84.
+        mosaic_order (constant): the mosaicing order, see constants.MOSAICS. Defaults to least cloudy
+        crs (_type_, optional): the CRS. Defaults to CRS.WGS84.
 
     Raises:
         ValueError: if data_collection is invalid
-
+        ValueError: if mosaic_order is invalid
     Returns:
         SentinelHubRequest: the request result
     """
@@ -51,6 +54,8 @@ def make_box_request(
 
     if not data_collection.api_id in valid_ids:
         raise ValueError(f"Collection {data_collection.api_id} is not supported")
+    if not mosaic_order in MOSAICS.values():
+        raise ValueError(f"invalid mosaicing order: valid are {MOSAICS}")
 
     # set data source to match config
     data_collection.service_url = config.sh_base_url
@@ -66,6 +71,7 @@ def make_box_request(
                 data_collection=data_collection,
                 time_interval=time_interval,
                 maxcc=max_could_frac,
+                mosaicking_order=mosaic_order,
             )
         ],
         responses=[SentinelHubRequest.output_response("default", MimeType.PNG)],
