@@ -7,10 +7,15 @@ This is not intended as a fully fledged project with tests but could be adapted 
 
 ## sentinehub back end
 
-The sentinelhub wrapper comes with functions to set your credentials and to request scripts.
+The sentinelhub wrapper uses the sentinelhub package as backend and comes with functions to set your credentials and to request scripts.
+The SH backend with the copernicus dataspace access is fast and automatically mosaics data. It is however, less flexible than the pystac functions.
 
->**NOTE**: The sentinelhub_wrapper uses the copernicus dataspace, which does not include all features (e.g. no cloud mask). The paid version includes more data flags and masks.
+>**NOTE**: The sentinelhub_wrapper uses the copernicus dataspace, which does not include all features (e.g. no cloud mask). It seems the paid version includes more data flags and masks. It also requires an account (see setup)
 
+## Pystac backend
+The pystac backend allows to access the aws earth-search and microsoft planetary computer data libraries, which do not require an account. Mosaicking (collating/stacking data when the AOI spans several granules or the time dimension) does not work out of the box. The wrappers here do this, as illustrated in the example.
+
+Overall the pystac runs quite a lot slower than the SH does, even when one copies directly the microsoft git examples. 
 
 ## setup
 
@@ -24,19 +29,25 @@ From *vscode*, you can make a *venv* in a few clicks:\
 - navigate to pyproject.toml or requirements.txt
 - click create environment
 
+
 ## usage
 see the example folder
 
 ## dependencies:
-please check out pyproject.toml dependencies list or requirements.txt for a full list
+please check out pyproject.toml dependencies for a full list
 Here are some important required packages
 - sentinelhub
 - pystac
+- stackstac
+- rasterio
+- xarray
+- matplotlib
+- geopandas
 
 ## issues
 the dynamic link between requirements.txt and pyproject.toml does not work
 
 ## TODOS
 - fix projections and lat/lon plotting
-- try odc.stac stac_load backend
+- try more in depth odc.stac stac_load backend (also slow)
 - try odc.alog to_rgba
